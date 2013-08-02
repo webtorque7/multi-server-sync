@@ -1,0 +1,13 @@
+MultiServerSync_Controller:
+  Servers:
+    - 127.0.0.1
+    - 192.168.159.138
+    - 192.168.159.138
+  Host:
+    - telarc.loc
+    - staysouth.loc
+    - theagents.loc
+  IsSingleHost:
+    false
+  SingleHost:
+    www.gen-i.co.nz

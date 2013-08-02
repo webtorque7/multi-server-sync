@@ -1,0 +1,6 @@
+---
+Name: myotherroutes
+---
+Director:
+  rules:
+    'multisync/$Action': 'MultiServerSync_Controller'
