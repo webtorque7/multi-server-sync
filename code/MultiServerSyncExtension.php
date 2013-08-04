@@ -8,20 +8,30 @@
  */
 
 class MultiServerSyncExtension extends DataExtension{
+
+        public static $db = array(
+                'Secret' => 'Varchar(100)'
+        );
+
 	public function onBeforeWrite(){
+
+                if (!$this->owner->Secret) {
+                        $this->owner->Secret = md5(md5($this->owner->Filename) . time());
+                }
+
 		parent::onBeforeWrite();
 	}
 
 	public function onAfterWrite(){
 		parent::onAfterWrite();
 
-		$fileName = $this->owner->Filename;
-
-		$fileSenderOBJ = new MultiServerSync_Controller();
-
-		foreach($fileSenderOBJ->getServerIPHost() as $keyIP){
-			$fileSenderOBJ->FileSender("../".$fileName, $keyIP['IP'], $keyIP['HOST']);
-		}
+                MultiServerSync::create()->synchFile($this);
 
 	}
+
+        public function onBeforeDelete() {
+                parent::onBeforeDelete();
+
+                MultiServerSync::create()->deleteFile($this);
+        }
 }
