@@ -25,7 +25,7 @@ class MultiServerSyncExtension extends DataExtension{
 	public function onAfterWrite(){
 		parent::onAfterWrite();
 
-                MultiServerSync::create()->synchFile($this);
+                MultiServerSync::create()->syncFile($this);
 
 	}
 
