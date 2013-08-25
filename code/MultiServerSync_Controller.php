@@ -10,7 +10,7 @@ class MultiServerSync extends Object {
 
                 if ($servers) foreach ($servers as $server) {
                         //don't sync to self
-                        if ($server != $_SERVER['SERVER_ADDR']) {
+                        if ($server != $this->getServerIP()) {
                                 $this->send(
                                         "http://{$server}/multisync/filereceiver",
                                         array('Host:' . $_SERVER['HTTP_HOST']),
@@ -29,9 +29,9 @@ class MultiServerSync extends Object {
 
                 if ($servers) foreach ($servers as $server) {
                         //don't sync to self
-                        if ($server != $_SERVER['SERVER_ADDR']) {
+                        if ($server != $this->getServerIP()) {
                                 $this->send(
-                                        "http://{$server}/multisync/filereceiver",
+                                        "http://{$server}/multisync/deletefile",
                                         array('Host:' . $_SERVER['HTTP_HOST']),
                                         array(
                                                 'Secret' => $file->Secret,
@@ -52,6 +52,16 @@ class MultiServerSync extends Object {
                 $result = curl_exec ($ch);
                 curl_close ($ch);
         }
+
+	private function getServerIP() {
+		if (isset($_SERVER['LOCAL_ADDR'])) {
+			return $_SERVER['LOCAL_ADDR'];
+		}
+		else if (isset($_SERVER['SERVER_ADDR'])) {
+			return $_SERVER['SERVER_ADDR'];
+		}
+		return '';
+	}
 
 }
 

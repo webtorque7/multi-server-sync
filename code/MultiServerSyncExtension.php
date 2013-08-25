@@ -7,7 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
-class MultiServerSyncExtension extends DataExtension{
+class MultiServerSyncExtension extends DataExtension
+{
 
         public static $db = array(
                 'Secret' => 'Varchar(100)'
@@ -25,13 +26,13 @@ class MultiServerSyncExtension extends DataExtension{
 	public function onAfterWrite(){
 		parent::onAfterWrite();
 
-                MultiServerSync::create()->synchFile($this);
+                MultiServerSync::create()->syncFile($this->owner);
 
 	}
 
         public function onBeforeDelete() {
                 parent::onBeforeDelete();
 
-                MultiServerSync::create()->deleteFile($this);
+                MultiServerSync::create()->deleteFile($this->owner);
         }
 }
