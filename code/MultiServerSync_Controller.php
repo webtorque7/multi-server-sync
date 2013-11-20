@@ -17,7 +17,7 @@ class MultiServerSync extends Object {
                                         array(
                                                 'Secret' => $file->Secret,
                                                 'ID' => $file->ID,
-                                                'SyncFile' => '@' . $file->getFullPath()
+                                                'SyncFile' => $file->ClassName != 'Folder' ? '@' . $file->getFullPath() : ''
                                         )
                                 );
                         }
@@ -90,13 +90,18 @@ class MultiServerSync_Controller extends Controller {
 	public function filereceiver(){
 
 
-                if (!empty($_FILES['SyncFile']) && !empty($_POST['ID']) && !empty($_POST['Secret'])) {
+                if (!empty($_POST['ID']) && !empty($_POST['Secret'])) {
                         $file = File::get()->byID($_POST['ID']);
 
                         if ($file && $file->Secret == $_POST['Secret']) {
                                 if (!file_exists($file->getFullPath())) {
-                                        move_uploaded_file($_FILES['SyncFile']['tmp_name'], $file->getFullPath());
-                                        return 'File Successful';
+					if ($file->ClassName != 'Folder' && !empty($_FILES['SyncFile'])) {
+						move_uploaded_file($_FILES['SyncFile']['tmp_name'], $file->getFullPath());
+						return 'File Successful';
+					}
+					else if ($file->ClassName == 'Folder') {
+						Filesystem::makeFolder($file->getFullPath());
+					}
                                 }
                         }
                 }
