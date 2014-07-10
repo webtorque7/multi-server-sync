@@ -74,15 +74,17 @@ class MultiServerSync extends Object {
 
 	}
 
-	public function send($url, $headers = array(), $postFields = array(), $filePath, $retries = 0) {
+	public function send($url, $headers = array(), $postFields = array(), $filePath = null, $retries = 0) {
 		// Execute CURL
 		$ch = curl_init($url);
 
 		if ($filePath && !function_exists('curl_file_create')) {
 			$postFields['SyncFile'] = '@' . $filePath;
-		} else {
+		}
+		else if ($filePath) {
 			$postFields['SyncFile'] = curl_file_create($filePath, mime_content_type($filePath), 'SyncFile');
 		}
+
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
@@ -111,12 +113,12 @@ class MultiServerSync extends Object {
 				throw new Exception(sprintf('Failed to update file (%s) with server (%s), ' . $curlError, $postFields['ID'], $url));
 			}
 		}
-		else if ($statusCode >= 400) {
+		else if ($statusCode['http_code'] >= 400) {
 			if ($retries < $this->config()->max_retries) {
 				$this->send($url, $headers, $postFields, $filePath, ++$retries);
 			}
 			else {
-				throw new Exception(sprintf('Failed to update file (%s) with server (%s), Status code ' . $statusCode, $postFields['ID'], $url));
+				throw new Exception(sprintf('Failed to update file (%s) with server (%s), Status code ' . $statusCode['http_code'], $postFields['ID'], $url));
 			}
 		}
 

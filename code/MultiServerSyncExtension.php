@@ -43,10 +43,7 @@ class MultiServerSyncExtension extends DataExtension
 		}
 
 		if (!$this->isNewRecord && $this->owner->isChanged('Filename')) {
-
 			MultiServerSync::create()->renameFile($this->owner);
-
-
 		}
 	}
 
@@ -56,7 +53,26 @@ class MultiServerSyncExtension extends DataExtension
                 MultiServerSync::create()->deleteFile($this->owner);
         }
 
+	/**
+	 * Gets Filename if changed, this is only useful before onAfterWrite has moved the file
+	 * This is necessary as extensions fire before the main File class has moved the file to the new Filename
+	 * @return mixed
+	 */
+	public function getCurrentFilename() {
+		if ($this->owner->isChanged('Filename')) {
+			$changedFields = $this->owner->getChangedFields();
+			$pathBefore = $changedFields['Filename']['before'];
+			return $pathBefore;
+		}
+
+		return $this->owner->Filename;
+	}
+
+	public function getCurrentFullPath() {
+		return Director::baseFolder() . '/' . $this->getCurrentFilename();
+	}
+
 	public function isModified() {
-		return strtotime(SS_Datetime::now()) - filemtime($this->owner->getFullPath()) > self::$modified_difference;
+		return file_exists($this->getCurrentFullPath()) && strtotime(SS_Datetime::now()) - filemtime($this->getCurrentFullPath()) > self::$modified_difference;
 	}
 }
