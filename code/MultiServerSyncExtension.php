@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: davis
@@ -6,7 +7,6 @@
  * Time: 15:03
  * To change this template use File | Settings | File Templates.
  */
-
 class MultiServerSyncExtension extends DataExtension
 {
 
@@ -18,15 +18,15 @@ class MultiServerSyncExtension extends DataExtension
 
 	public $isNewRecord = false;
 
-        public static $db = array(
-                'Secret' => 'Varchar(100)'
-        );
+	public static $db = array(
+		'Secret' => 'Varchar(100)'
+	);
 
-	public function onBeforeWrite(){
+	public function onBeforeWrite() {
 
-                if (!$this->owner->Secret) {
-                        $this->owner->Secret = md5(md5($this->owner->Filename) . time());
-                }
+		if (!$this->owner->Secret) {
+			$this->owner->Secret = md5(md5($this->owner->Filename) . time());
+		}
 
 		if (!$this->owner->exists()) {
 			$this->isNewRecord = true;
@@ -35,11 +35,11 @@ class MultiServerSyncExtension extends DataExtension
 		parent::onBeforeWrite();
 	}
 
-	public function onAfterWrite(){
+	public function onAfterWrite() {
 		parent::onAfterWrite();
 
 		if ($this->isNewRecord || $this->owner->isModified()) {
-                        MultiServerSync::create()->syncFile($this->owner);
+			MultiServerSync::create()->syncFile($this->owner);
 		}
 
 		if (!$this->isNewRecord && $this->owner->isChanged('Filename')) {
@@ -47,11 +47,11 @@ class MultiServerSyncExtension extends DataExtension
 		}
 	}
 
-        public function onBeforeDelete() {
-                parent::onBeforeDelete();
+	public function onBeforeDelete() {
+		parent::onBeforeDelete();
 
-                MultiServerSync::create()->deleteFile($this->owner);
-        }
+		MultiServerSync::create()->deleteFile($this->owner);
+	}
 
 	/**
 	 * Gets Filename if changed, this is only useful before onAfterWrite has moved the file
